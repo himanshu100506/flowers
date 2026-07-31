@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Happy Girlfriend's Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Great+Vibes&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --soft-pink:#E9C8C1;
+    --rose-pink:#B86D72;
+    --cream:#F7EFE7;
+    --white:#ffffff;
+    --gold:#CDA66B;
+    --deep-gold:#8E6338;
+    --plum:#302329;
+    --mauve:#8B555D;
+    --shadow: rgba(40,25,28,0.4);
+    --paper: #F6EDDF;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,219,163,.22), transparent 24%),
+      radial-gradient(ellipse at 18% 70%, rgba(159,82,92,.16), transparent 34%),
+      linear-gradient(145deg, #171116 0%, #45272f 46%, #120d12 100%);
+    font-family:'Cormorant Garamond', serif;
+    color:var(--plum);
+  }
+  .script{ font-family:'Great Vibes', cursive; }
+  .display{ font-family:'Playfair Display', serif; }
+  .ui{ font-family:'Poppins', sans-serif; }
+
+  #bgCanvas{
+    position:fixed; inset:0; width:100%; height:100%; z-index:1; pointer-events:none;
+  }
+
+  #app{
+    position:fixed; inset:0; z-index:2;
+    display:flex; align-items:center; justify-content:center;
+    perspective: 1600px;
+    transform-style:preserve-3d;
+    will-change:transform;
+  }
+  .scene{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity 1.15s cubic-bezier(.2,.75,.2,1), transform 1.15s cubic-bezier(.2,.75,.2,1), filter 1.15s ease;
+    transform:scale(1.04) translateZ(-40px);
+    filter:blur(5px);
+    padding: 24px;
+    text-align:center;
+  }
+  .scene.active{ opacity:1; pointer-events:auto; transform:scale(1) translateZ(0); filter:blur(0); }
+  .scene.active > *{ animation: sceneIn 1.4s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes sceneIn{ from{opacity:0; transform:translateY(18px) scale(.985);} to{opacity:1; transform:none;} }
+
+  /* ---------- shared UI bits ---------- */
+  .eyebrow{
+    letter-spacing:0.35em; text-transform:uppercase; font-size:12px;
+    color:var(--mauve); font-family:'Poppins',sans-serif; font-weight:500;
+    margin-bottom: 6px;
+  }
+  .hero-title{
+    font-size: clamp(30px, 6vw, 54px);
+    color:var(--mauve);
+    margin: 0 0 8px 0;
+    text-shadow: 0 4px 24px rgba(255,143,177,0.35);
+  }
+  .sub-line{
+    font-size: clamp(14px, 2.4vw, 18px);
+    color: var(--plum);
+    opacity:0.75;
+    font-style:italic;
+    letter-spacing:0.04em;
+  }
+  .glow-btn{
+    margin-top: 34px;
+    padding: 14px 38px;
+    border-radius: 999px;
+    border: 1px solid rgba(232,184,114,0.7);
+    background: linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,214,232,0.55));
+    backdrop-filter: blur(10px);
+    color: var(--plum);
+    font-family:'Poppins', sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    cursor:pointer;
+    box-shadow: 0 8px 30px rgba(232,184,114,0.35), inset 0 0 0 1px rgba(255,255,255,0.4);
+    opacity:0;
+    transform: translateY(14px);
+    transition: box-shadow .4s ease, transform .3s ease;
+  }
+  .glow-btn:hover{
+    box-shadow: 0 10px 40px rgba(232,184,114,0.55), inset 0 0 0 1px rgba(255,255,255,0.6);
+    transform: translateY(-2px);
+  }
+  .glow-btn.show{ opacity:1; transform:translateY(0); }
+
+  /* ---------- Scene 1: Gift ---------- */
+  #giftWrap{
+    position:relative;
+    cursor:pointer;
+    filter: drop-shadow(0 34px 34px rgba(10,5,8,.62));
+    animation: floatGift 4.5s ease-in-out infinite;
+    transform-origin: center bottom;
+    transition: filter .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
+    will-change:transform,filter;
+  }
+  @keyframes floatGift{
+    0%,100%{ transform:translateY(0px) rotate(0deg); }
+    50%{ transform:translateY(-16px) rotate(-1.2deg); }
+  }
+  #giftWrap svg{ width: min(58vw, 320px); height:auto; overflow:visible; filter:url(#giftDepth) drop-shadow(0 0 22px rgba(255,211,146,.14)); transform:translateZ(24px); }
+  #giftWrap:hover{ filter: drop-shadow(0 38px 44px rgba(10,5,8,.72)) drop-shadow(0 0 24px rgba(255,209,142,.26)); transform:translateY(-5px) rotate(-1deg) scale(1.025); }
+  #giftWrap:after{ content:""; position:absolute; inset:12% 10%; pointer-events:none; background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.2) 48%, transparent 58%); mix-blend-mode:screen; opacity:.35; animation: sheen 5s ease-in-out infinite; }
+  @keyframes sheen{ 0%,55%{transform:translateX(-75%); opacity:0;} 70%{opacity:.5;} 100%{transform:translateX(75%); opacity:0;} }
+  .tap-hint{
+    margin-top: 26px; font-size:15px; letter-spacing:0.08em; color:var(--mauve);
+    font-family:'Poppins',sans-serif; font-weight:300;
+    animation: pulseHint 2.2s ease-in-out infinite;
+  }
+  @keyframes pulseHint{ 0%,100%{opacity:0.45;} 50%{opacity:1;} }
+  .sparkle-halo{
+    position:absolute; width: 420px; height:420px; border-radius:50%;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(255,222,166,0.2) 0%, rgba(255,214,232,0.1) 40%, transparent 70%);
+    opacity:0; transition: opacity .5s ease; pointer-events:none;
+  }
+  #giftHoverArea:hover ~ .sparkle-halo, .gift-hovering .sparkle-halo{ opacity:1; }
+
+  /* ---------- Scene 2: Bouquet ---------- */
+  #bouquetStage{ position:relative; width:100%; display:flex; flex-direction:column; align-items:center; }
+  #bouquetSvgWrap{
+    filter: drop-shadow(0 30px 24px rgba(15,8,10,.56));
+    will-change:transform;
+    transform-style:preserve-3d;
+  }
+  #bouquetSvgWrap svg{ width:min(62vw, 380px); height:auto; overflow:visible; filter:url(#bouquetDepth); }
+  #finalBouquetWrap{ width:min(62vw, 380px); min-height:min(62vw, 380px); filter:drop-shadow(0 30px 24px rgba(15,8,10,.56)); will-change:transform; }
+  #finalBouquetWrap svg{ width:100%; height:auto; overflow:visible; filter:url(#bouquetDepth); }
+  #bouquetSvgWrap:after, #finalBouquetWrap:after{
+    content:""; position:absolute; left:12%; right:12%; bottom:1%; height:18px;
+    border-radius:50%; background:rgba(4,1,4,.58); filter:blur(14px); z-index:-1;
+  }
+  .sway-slow{ animation: swaySlow 6s ease-in-out infinite; transform-origin: 50% 100%; }
+  .sway-med{ animation: swaySlow 5s ease-in-out infinite; animation-delay: -1.5s; transform-origin: 50% 100%; }
+  @keyframes swaySlow{
+    0%,100%{ transform: rotate(-1.3deg); }
+    50%{ transform: rotate(1.3deg); }
+  }
+  .display-line{
+    margin-top: 30px; font-size: clamp(20px,3.6vw,30px); color:#F4DCC7;
+    font-style: italic; opacity:0; transform: translateY(10px);
+  }
+  #attachedNote{
+    position:absolute; top:43%; left:calc(50% + min(15vw, 88px)); width:74px; height:52px;
+    border:1px solid rgba(205,166,107,.8); border-radius:3px 3px 8px 3px;
+    background:linear-gradient(145deg,#fffdf7,#e9d4bd); box-shadow:5px 9px 14px rgba(12,5,8,.34);
+    opacity:0; transform:translate3d(12px,20px,0) rotate(8deg); pointer-events:none;
+  }
+  #attachedNote:before{ content:""; position:absolute; left:0; right:0; top:0; height:28px; background:linear-gradient(35deg,transparent 49%,rgba(142,99,56,.22) 50%,transparent 52%); border-bottom:1px solid rgba(142,99,56,.18); }
+  #attachedNote:after{ content:""; position:absolute; width:22px; height:8px; left:-13px; top:-10px; border:2px solid #d6ad70; border-bottom:0; border-radius:14px 14px 0 0; transform:rotate(-18deg); }
+
+  /* ---------- Scene 3: Envelope ---------- */
+  #envelopeStage{ position:relative; display:flex; flex-direction:column; align-items:center; }
+  #envelopeSvgWrap{ cursor:pointer; filter: drop-shadow(0 22px 26px var(--shadow)); will-change:transform; transition:filter .5s ease; }
+  #envelopeSvgWrap:hover{ filter:drop-shadow(0 28px 30px rgba(12,6,8,.65)) drop-shadow(0 0 18px rgba(255,216,153,.2)); }
+  #envelopeSvgWrap svg{ width:min(56vw,300px); height:auto; overflow:visible; filter:url(#envelopeDepth); }
+  #envelopeSvgWrap:after{ content:""; position:absolute; inset:18% 8%; background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.55) 48%, transparent 59%); mix-blend-mode:screen; opacity:.35; animation:silkSheen 6s ease-in-out infinite; pointer-events:none; }
+  @keyframes silkSheen{ 0%,58%{transform:translateX(-80%);opacity:0;} 72%{opacity:.5;} 100%{transform:translateX(80%);opacity:0;} }
+  .env-hint{ margin-top:22px; font-size:14px; color:var(--mauve); font-family:'Poppins',sans-serif; letter-spacing:0.06em; opacity:0.8;}
+
+  /* ---------- Scene 4: Letter ---------- */
+  #letterStage{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  #paper{
+    position:relative;
+    width: min(92vw, 560px);
+    max-height: 84vh;
+    overflow-y: auto;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,.7), transparent 30%),
+      repeating-linear-gradient(0deg, rgba(119,75,43,.025) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(transparent 0 38px, rgba(201,151,76,0.08) 39px, transparent 40px),
+      linear-gradient(180deg, var(--paper), #EBDCC6 100%);
+    border-radius: 6px;
+    padding: 46px 44px 40px;
+    box-shadow: 0 30px 60px var(--shadow), 0 2px 0 rgba(255,255,255,0.8) inset;
+    border: 1px solid rgba(205,166,107,0.65);
+    transform-style:preserve-3d;
+  }
+  #paper:before, #paper:after{ content:""; position:absolute; pointer-events:none; }
+  #paper:before{ inset:12px; border:1px solid rgba(142,99,56,.2); box-shadow:inset 0 0 25px rgba(121,78,45,.08); }
+  #paper:after{ top:0; left:16%; width:68%; height:1px; background:rgba(255,255,255,.8); box-shadow:0 70px 20px rgba(117,74,39,.04); }
+  #paper:before{ background:linear-gradient(105deg, transparent 0 45%, rgba(117,74,39,.05) 50%, transparent 55%); }
+  #paper{ will-change:transform,opacity; }
+  #paper::-webkit-scrollbar{ width:6px; }
+  #paper::-webkit-scrollbar-thumb{ background: var(--gold); border-radius:4px; }
+  .letter-heart{ text-align:center; font-size:22px; margin-bottom: 6px; }
+  .letter-line{
+    font-family:'Great Vibes', cursive;
+    font-size: clamp(24px, 4.4vw, 32px);
+    line-height: 1.55;
+    color: #5A3540;
+    opacity:0;
+    transform: translateY(8px);
+    text-align:center;
+  }
+  .letter-line.spacer{ height: 8px; }
+  .letter-signature{ margin-top:10px; }
+
+  /* ---------- Final Scene ---------- */
+  .forever-title{
+    font-size: clamp(34px, 7vw, 64px);
+    color: #F0D3B7;
+    opacity:0; transform: scale(0.9);
+    text-shadow: 0 6px 30px rgba(255,143,177,0.4);
+  }
+
+  /* ---------- White flash ---------- */
+  #flash{
+    position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:50;
+  }
+  #warmLight{ position:fixed; inset:0; z-index:8; pointer-events:none; opacity:0; background:radial-gradient(ellipse at 50% 58%, rgba(255,211,137,.65), transparent 42%); mix-blend-mode:screen; }
+  #warmLight:before, #warmLight:after{ content:""; position:absolute; inset:-20%; background:conic-gradient(from 210deg at 50% 80%, transparent 0 18%, rgba(255,218,157,.13) 24%, transparent 31% 48%, rgba(255,238,196,.08) 55%, transparent 62%); filter:blur(18px); opacity:.7; animation:godRay 12s ease-in-out infinite alternate; }
+  #warmLight:after{ animation-delay:-5s; transform:rotate(12deg); opacity:.35; }
+  @keyframes godRay{ from{transform:rotate(-5deg) scale(1);} to{transform:rotate(8deg) scale(1.08);} }
+  body:after{ content:""; position:fixed; inset:0; z-index:7; pointer-events:none; background:radial-gradient(ellipse at center, transparent 42%, rgba(8,4,8,.48) 100%); mix-blend-mode:multiply; }
+
+  /* ---------- Petal (DOM burst petals) ---------- */
+  .burst-petal{
+    position:fixed; z-index:30; width:16px; height:16px; border-radius: 50% 0 50% 50%;
+    background: radial-gradient(circle at 30% 25%, #fff7f0 0 8%, #f6b2bf 32%, #9e4b61 100%);
+    box-shadow:0 2px 8px rgba(55,14,28,.35);
+    pointer-events:none;
+    top:0; left:0;
+  }
+
+  /* ---------- Sound toggle ---------- */
+  #soundBtn{
+    position:fixed; top:20px; right:20px; z-index:60;
+    width:46px; height:46px; border-radius:50%;
+    background: rgba(29,18,22,0.55);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(232,184,114,0.5);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    opacity:0; pointer-events:none; transition:opacity .6s ease;
+  }
+  #soundBtn.visible{ opacity:1; pointer-events:auto; }
+  #soundBtn svg{ width:20px; height:20px; stroke:var(--plum); }
+
+  @media (max-width: 480px){
+    #paper{ padding: 34px 24px 30px; }
+    .glow-btn{ padding:12px 30px; font-size:14px; }
+  }
+  @media (prefers-reduced-motion: reduce){ *, *:before, *:after{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<button id="soundBtn" aria-label="Toggle music">
+  <svg id="soundIconOn" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M18.36 5.64a9 9 0 0 1 0 12.72"></path></svg>
+  <svg id="soundIconOff" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+</button>
+
+<div id="flash"></div>
+<div id="warmLight"></div>
+
+<div id="app">
+
+  <!-- SCENE 1 : GIFT -->
+  <section class="scene active" id="scene1">
+    <div class="sparkle-halo" id="halo"></div>
+    <div id="giftWrap" aria-label="Open the gift" role="button" tabindex="0">
+      <svg viewBox="0 0 200 190" id="giftSvg">
+        <defs>
+          <linearGradient id="boxGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFF3E8"/>
+            <stop offset="100%" stop-color="#FFD6E8"/>
+          </linearGradient>
+          <linearGradient id="lidGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFE3F0"/>
+            <stop offset="100%" stop-color="#FF9FBE"/>
+          </linearGradient>
+          <linearGradient id="ribbonGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#E8B872"/>
+            <stop offset="50%" stop-color="#FFD79A"/>
+            <stop offset="100%" stop-color="#E8B872"/>
+          </linearGradient>
+          <filter id="giftDepth" x="-20%" y="-20%" width="140%" height="150%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1.8" result="blur"/>
+            <feOffset dy="4" result="offset"/>
+            <feComponentTransfer><feFuncA type="linear" slope=".35"/></feComponentTransfer>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <g id="boxBody">
+          <rect x="35" y="95" width="130" height="80" rx="10" fill="url(#boxGrad)" stroke="#F3B6CE" stroke-width="1"/>
+          <rect x="90" y="95" width="20" height="80" fill="url(#ribbonGrad)" opacity="0.9"/>
+        </g>
+
+        <g id="lidGroup">
+          <rect x="28" y="72" width="144" height="34" rx="12" fill="url(#lidGrad)" stroke="#F58EB2" stroke-width="1"/>
+          <rect x="90" y="72" width="20" height="34" fill="url(#ribbonGrad)" opacity="0.95"/>
+        </g>
+
+        <g id="ribbonGroup">
+          <path id="loopLeft" d="M100 74 C 60 50, 40 78, 70 84 C 88 88, 96 80, 100 74 Z" fill="url(#ribbonGrad)" stroke="#D89A55" stroke-width="0.6"/>
+          <path id="loopRight" d="M100 74 C 140 50, 160 78, 130 84 C 112 88, 104 80, 100 74 Z" fill="url(#ribbonGrad)" stroke="#D89A55" stroke-width="0.6"/>
+          <ellipse id="knot" cx="100" cy="76" rx="9" ry="7" fill="#F0C489" stroke="#D89A55" stroke-width="0.6"/>
+          <path id="tailLeft" d="M96 80 C 88 96, 84 104, 90 110 C 96 104, 98 92, 100 80 Z" fill="url(#ribbonGrad)"/>
+          <path id="tailRight" d="M104 80 C 112 96, 116 104, 110 110 C 104 104, 102 92, 100 80 Z" fill="url(#ribbonGrad)"/>
+        </g>
+      </svg>
+    </div>
+    <div class="tap-hint ui">Tap the gift</div>
+  </section>
+
+  <!-- SCENE 2 : BOUQUET -->
+  <section class="scene" id="scene2">
+    <div id="bouquetStage">
+      <div id="bouquetSvgWrap"></div>
+      <div id="attachedNote" aria-hidden="true"></div>
+      <div class="display-line script" id="displayLine">For the most beautiful girl ❤️</div>
+      <button class="glow-btn ui" id="toLetterBtn">Read My Letter 💌</button>
+    </div>
+  </section>
+
+  <!-- SCENE 3 : ENVELOPE -->
+  <section class="scene" id="scene3">
+    <div id="envelopeStage">
+      <div id="envelopeSvgWrap">
+        <svg viewBox="0 0 220 150" id="envSvg" overflow="visible">
+          <defs>
+            <filter id="envelopeDepth" x="-20%" y="-20%" width="140%" height="160%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="blur"/>
+              <feOffset dy="4" result="shadow"/>
+              <feComponentTransfer><feFuncA type="linear" slope=".3"/></feComponentTransfer>
+              <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="envGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFFDF8"/>
+              <stop offset="100%" stop-color="#FFF3E4"/>
+            </linearGradient>
+          </defs>
+          <rect x="10" y="20" width="200" height="120" rx="6" fill="url(#envGrad)" stroke="#E8B872" stroke-width="2"/>
+          <path id="envFlap" d="M10 20 L110 88 L210 20 Z" fill="#FFF6EA" stroke="#E8B872" stroke-width="2" stroke-linejoin="round" transform-origin="110px 20px"/>
+          <g id="waxSeal" transform="translate(110,80)">
+            <circle r="16" fill="#C97B8C"/>
+            <circle r="16" fill="none" stroke="#A85D6D" stroke-width="1" opacity="0.5"/>
+            <path d="M-6 2 C -6 -4 0 -4 0 1 C 0 -4 6 -4 6 2 C 6 6 0 9 0 9 C 0 9 -6 6 -6 2 Z" fill="#F3D3D9" opacity="0.85"/>
+          </g>
+        </svg>
+      </div>
+      <div class="env-hint ui" id="envHint">Break the seal...</div>
+    </div>
+  </section>
+
+  <!-- SCENE 4 : LETTER -->
+  <section class="scene" id="scene4">
+    <div id="letterStage">
+      <div id="paper">
+        <div class="letter-heart">❤️</div>
+        <div id="letterLines"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 5 : FINAL -->
+  <section class="scene" id="scene5">
+    <div id="finalBouquetWrap"></div>
+    <h2 class="forever-title script" id="foreverTitle">Forever Yours ❤️</h2>
+  </section>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+/* ============================================================
+   BACKGROUND PARTICLE SYSTEM (bokeh + sparkles + petals)
+   ============================================================ */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, DPR;
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W*DPR; canvas.height = H*DPR;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+let petalIntensity = 0.4; // grows through scenes
+let finaleMode = false;
+
+function rand(a,b){ return a + Math.random()*(b-a); }
+
+class Bokeh{
+  constructor(){ this.reset(true); }
+  reset(init){
+    this.x = rand(0,W); this.y = init ? rand(0,H) : H+50;
+    this.r = rand(40,110); this.vy = -rand(0.06,0.18); this.vx = rand(-0.05,0.05);
+    this.alpha = rand(0.03,0.09);
+    this.hue = Math.random() < 0.5 ? '255,214,232' : '255,249,246';
+  }
+  step(){
+    this.y += this.vy; this.x += this.vx;
+    if(this.y < -150) this.reset(false);
+  }
+  draw(){
+    const g = ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r);
+    g.addColorStop(0, `rgba(${this.hue},${this.alpha})`);
+    g.addColorStop(1, `rgba(${this.hue},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill();
+  }
+}
+
+class Sparkle{
+  constructor(){ this.reset(); }
+  reset(){
+    this.x = rand(0,W); this.y = rand(0,H);
+    this.r = rand(0.6,1.8); this.baseAlpha = rand(0.3,0.9);
+    this.speed = rand(0.02,0.06); this.phase = rand(0,Math.PI*2);
+  }
+  step(t){ this.phase += this.speed; }
+  draw(){
+    const a = this.baseAlpha * (0.5+0.5*Math.sin(this.phase));
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill();
+    if(finaleMode && this.r > 1.2){
+      ctx.strokeStyle = `rgba(255,236,195,${a * .55})`;
+      ctx.lineWidth = .7;
+      ctx.beginPath(); ctx.moveTo(this.x-this.r*3,this.y); ctx.lineTo(this.x+this.r*3,this.y); ctx.moveTo(this.x,this.y-this.r*3); ctx.lineTo(this.x,this.y+this.r*3); ctx.stroke();
+    }
+  }
+}
+
+class Petal{
+  constructor(){ this.reset(true); }
+  reset(init){
+    this.x = rand(0,W); this.y = init ? rand(-H,H) : -20;
+    this.size = rand(6,13);
+    this.vy = rand(0.25,0.6);
+    this.vx = rand(-0.3,0.3);
+    this.rot = rand(0,360); this.vr = rand(-0.6,0.6);
+    this.sway = rand(0.005,0.02); this.phase = rand(0,Math.PI*2);
+    this.color = Math.random() < 0.5 ? '#FF9FBE' : '#FFD6E8';
+  }
+  step(){
+    this.phase += this.sway;
+    this.y += this.vy; this.x += this.vx + Math.sin(this.phase)*0.4;
+    this.rot += this.vr;
+    if(this.y > H+20) this.reset(false);
+  }
+  draw(){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.rot*Math.PI/180);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.moveTo(0,-this.size/2);
+    ctx.quadraticCurveTo(this.size/2,-this.size/2,0,this.size/2);
+    ctx.quadraticCurveTo(-this.size/2,-this.size/2,0,-this.size/2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+const bokehs = Array.from({length:10}, ()=>new Bokeh());
+const sparkles = Array.from({length:70}, ()=>new Sparkle());
+let petals = Array.from({length:18}, ()=>new Petal());
+
+function setPetalCount(n){
+  if(petals.length < n){
+    while(petals.length < n) petals.push(new Petal());
+  } else {
+    petals = petals.slice(0,n);
+  }
+}
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  bokehs.forEach(b=>{ b.step(); b.draw(); });
+  sparkles.forEach(s=>{ s.step(); s.draw(); });
+  petals.forEach(p=>{ p.step(); p.draw(); });
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* ============================================================
+   AMBIENT AUDIO (procedural, no external files)
+   ============================================================ */
+let actx = null, masterGain = null, musicNodes = [], musicOn = true, musicStarted = false;
+
+function initAudio(){
+  if(actx) return;
+  actx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = actx.createGain();
+  masterGain.gain.value = 0.0001;
+  masterGain.connect(actx.destination);
+}
+
+function startAmbientPad(){
+  if(musicStarted) return;
+  musicStarted = true;
+  const chords = [
+    [261.63, 329.63, 392.00], // C E G
+    [246.94, 293.66, 369.99], // B D F#
+    [220.00, 277.18, 329.63], // A C# E
+    [233.08, 293.66, 349.23]  // Bb D F
+  ];
+  let chordIndex = 0;
+
+  function playChord(){
+    const now = actx.currentTime;
+    const freqs = chords[chordIndex % chords.length];
+    chordIndex++;
+    freqs.forEach((f,i)=>{
+      const osc = actx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = f/2;
+      const g = actx.createGain();
+      g.gain.value = 0;
+      osc.connect(g); g.connect(masterGain);
+      osc.start(now);
+      g.gain.linearRampToValueAtTime(0.05, now + 2.2);
+      g.gain.linearRampToValueAtTime(0.0, now + 7.5);
+      osc.stop(now + 7.6);
+    });
+    chime([freqs[0] * 2], 1.8, 'triangle', 0.018);
+  }
+  playChord();
+  window._padInterval = setInterval(playChord, 6000);
+  const now = actx.currentTime;
+  masterGain.gain.linearRampToValueAtTime(musicOn ? 0.6 : 0.0001, now + 2.5);
+}
+
+function chime(freqs, dur=0.9, type='sine', vol=0.18){
+  if(!actx) return;
+  const now = actx.currentTime;
+  freqs.forEach((f,i)=>{
+    const osc = actx.createOscillator();
+    osc.type = type; osc.frequency.value = f;
+    const g = actx.createGain();
+    g.gain.value = 0;
+    osc.connect(g); g.connect(masterGain);
+    const t0 = now + i*0.06;
+    osc.start(t0);
+    g.gain.linearRampToValueAtTime(vol, t0+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    osc.stop(t0+dur+0.05);
+  });
+}
+function sfxSparkleChime(){ chime([1046.5,1318.5,1568], 1.1, 'sine', 0.12); }
+function sfxRibbon(){ chime([392, 440, 523], 0.5, 'triangle', 0.1); }
+function sfxOpen(){ chime([523,659,784,1046], 1.4, 'sine', 0.14); }
+function sfxPaper(){ chime([300,340], 0.35, 'sawtooth', 0.03); }
+
+document.getElementById('soundBtn').addEventListener('click', ()=>{
+  musicOn = !musicOn;
+  document.getElementById('soundIconOn').style.display = musicOn ? 'block':'none';
+  document.getElementById('soundIconOff').style.display = musicOn ? 'none':'block';
+  if(actx){
+    const now = actx.currentTime;
+    masterGain.gain.cancelScheduledValues(now);
+    masterGain.gain.linearRampToValueAtTime(musicOn ? 0.6 : 0.0001, now + 0.6);
+  }
+});
+
+function armAudioOnFirstGesture(){
+  const handler = ()=>{
+    initAudio();
+    startAmbientPad();
+    window.removeEventListener('pointerdown', handler);
+  };
+  window.addEventListener('pointerdown', handler, {once:true});
+}
+armAudioOnFirstGesture();
+
+/* ============================================================
+   BOUQUET SVG BUILDER (reused in scene 2 and scene 5)
+   ============================================================ */
+function buildBouquetSVG(){
+  return `
+  <svg viewBox="0 0 220 260" overflow="visible">
+    <defs>
+      <filter id="bouquetDepth" x="-25%" y="-20%" width="150%" height="160%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="blur"/>
+        <feOffset dy="5" result="shadow"/>
+        <feComponentTransfer><feFuncA type="linear" slope=".38"/></feComponentTransfer>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <radialGradient id="roseG" cx="50%" cy="40%" r="65%">
+        <stop offset="0%" stop-color="#FFE1EC"/>
+        <stop offset="100%" stop-color="#FF8FB1"/>
+      </radialGradient>
+      <radialGradient id="roseWG" cx="50%" cy="40%" r="65%">
+        <stop offset="0%" stop-color="#FFFFFF"/>
+        <stop offset="100%" stop-color="#FFE9E0"/>
+      </radialGradient>
+      <linearGradient id="tulipG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFC3DA"/>
+        <stop offset="100%" stop-color="#FF8FB1"/>
+      </linearGradient>
+      <radialGradient id="peonyG" cx="50%" cy="35%" r="70%">
+        <stop offset="0%" stop-color="#FFF3F6"/>
+        <stop offset="100%" stop-color="#FFB6CE"/>
+      </radialGradient>
+      <linearGradient id="leafG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#B7C9A0"/>
+        <stop offset="100%" stop-color="#8FA377"/>
+      </linearGradient>
+    </defs>
+
+    <!-- stems -->
+    <path d="M110 180 L100 250 M110 180 L110 254 M110 180 L120 250" stroke="#8FA377" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- ribbon wrap -->
+    <path d="M92 178 Q110 200 128 178" stroke="#E8B872" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M95 190 Q110 208 125 190" stroke="#E8B872" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- eucalyptus sprigs -->
+    <g class="sway-med">
+      <ellipse cx="55" cy="130" rx="8" ry="4" fill="url(#leafG)" transform="rotate(-30 55 130)"/>
+      <ellipse cx="45" cy="118" rx="7" ry="3.5" fill="url(#leafG)" transform="rotate(-40 45 118)"/>
+      <ellipse cx="165" cy="128" rx="8" ry="4" fill="url(#leafG)" transform="rotate(30 165 128)"/>
+      <ellipse cx="175" cy="116" rx="7" ry="3.5" fill="url(#leafG)" transform="rotate(40 175 116)"/>
+    </g>
+
+    <!-- baby's breath -->
+    <g class="sway-slow" fill="#FFFDF8">
+      <circle cx="65" cy="95" r="3"/><circle cx="72" cy="86" r="2.4"/><circle cx="60" cy="105" r="2.4"/>
+      <circle cx="155" cy="95" r="3"/><circle cx="148" cy="86" r="2.4"/><circle cx="160" cy="106" r="2.4"/>
+      <circle cx="110" cy="55" r="2.6"/><circle cx="120" cy="50" r="2.2"/>
+    </g>
+
+    <!-- tulips -->
+    <g class="sway-slow">
+      <path d="M75 120 C70 100 78 85 85 82 C92 85 100 100 95 120 C88 112 82 112 75 120 Z" fill="url(#tulipG)"/>
+      <path d="M135 118 C130 98 138 83 145 80 C152 83 160 98 155 118 C148 110 142 110 135 118 Z" fill="url(#tulipG)"/>
+    </g>
+
+    <!-- lilies (star shaped) -->
+    <g class="sway-med">
+      <g transform="translate(60,70)">
+        <path d="M0,-18 L5,-4 L18,-2 L7,7 L10,20 L0,11 L-10,20 L-7,7 L-18,-2 L-5,-4 Z" fill="#FFFFFF" stroke="#FFE1EC" stroke-width="1"/>
+        <circle r="3" fill="#E8B872"/>
+      </g>
+      <g transform="translate(160,68)">
+        <path d="M0,-18 L5,-4 L18,-2 L7,7 L10,20 L0,11 L-10,20 L-7,7 L-18,-2 L-5,-4 Z" fill="#FFFFFF" stroke="#FFE1EC" stroke-width="1"/>
+        <circle r="3" fill="#E8B872"/>
+      </g>
+    </g>
+
+    <!-- peonies (fluffy layered circles) -->
+    <g class="sway-slow">
+      <g transform="translate(85,45)">
+        <circle r="20" fill="url(#peonyG)"/>
+        <circle r="13" cy="-2" fill="#FFE1EC"/>
+        <circle r="7" cy="-2" fill="#FFC9DB"/>
+      </g>
+      <g transform="translate(140,42)">
+        <circle r="18" fill="url(#peonyG)"/>
+        <circle r="12" cy="-2" fill="#FFE1EC"/>
+        <circle r="6" cy="-2" fill="#FFC9DB"/>
+      </g>
+    </g>
+
+    <!-- roses (center, spiral swirl) -->
+    <g class="sway-med">
+      <g transform="translate(110,30)">
+        <circle r="22" fill="url(#roseG)"/>
+        <path d="M0,0 m-14,0 a14,14 0 1,1 14,14 a9,9 0 1,1 -9,-9 a5,5 0 1,1 5,5" fill="none" stroke="#FF8FB1" stroke-width="2.4" opacity="0.7"/>
+      </g>
+      <g transform="translate(72,48)">
+        <circle r="15" fill="url(#roseWG)"/>
+        <path d="M0,0 m-9,0 a9,9 0 1,1 9,9 a6,6 0 1,1 -6,-6" fill="none" stroke="#FFD1C9" stroke-width="1.8" opacity="0.7"/>
+      </g>
+      <g transform="translate(150,50)">
+        <circle r="14" fill="url(#roseG)"/>
+        <path d="M0,0 m-8,0 a8,8 0 1,1 8,8 a5,5 0 1,1 -5,-5" fill="none" stroke="#FF8FB1" stroke-width="1.6" opacity="0.7"/>
+      </g>
+    </g>
+  </svg>`;
+}
+document.getElementById('bouquetSvgWrap').innerHTML = buildBouquetSVG();
+
+/* ============================================================
+   SCENE MANAGEMENT
+   ============================================================ */
+const scenes = [1,2,3,4,5].map(n=>document.getElementById('scene'+n));
+function showScene(n){
+  scenes.forEach((s,i)=> s.classList.toggle('active', i === n-1));
+  if(n > 1) document.getElementById('soundBtn').classList.add('visible');
+  gsap.fromTo('#app', {rotateY:n % 2 ? -1.5 : 1.5, rotateX:n === 1 ? 0 : 2, scale:n === 1 ? 1 : .985}, {rotateY:0, rotateX:0, scale:1, duration:1.35, ease:'power3.out', overwrite:'auto'});
+}
+
+/* ---------- Scene 1 interactions ---------- */
+const giftWrap = document.getElementById('giftWrap');
+const halo = document.getElementById('halo');
+giftWrap.addEventListener('mouseenter', ()=> halo.style.opacity = 1);
+giftWrap.addEventListener('mouseleave', ()=> halo.style.opacity = 0);
+giftWrap.addEventListener('pointermove', (event)=>{
+  const rect = giftWrap.getBoundingClientRect();
+  const x = (event.clientX - rect.left) / rect.width - 0.5;
+  const y = (event.clientY - rect.top) / rect.height - 0.5;
+  gsap.to(giftWrap, {rotateY:x*5, rotateX:y*-4, duration:.5, overwrite:true, ease:'power2.out'});
+});
+giftWrap.addEventListener('pointerleave', ()=> gsap.to(giftWrap, {rotateY:0, rotateX:0, duration:.8, ease:'elastic.out(1,.5)'}));
+
+let giftOpened = false;
+giftWrap.addEventListener('click', ()=>{
+  if(giftOpened) return;
+  giftOpened = true;
+  openGift();
+});
+giftWrap.addEventListener('keydown', (event)=>{
+  if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); giftWrap.click(); }
+});
+
+function spawnBurstPetals(cx, cy, count){
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'burst-petal';
+    el.style.left = cx+'px'; el.style.top = cy+'px';
+    document.body.appendChild(el);
+    const angle = rand(0, Math.PI*2);
+    const dist = rand(150, 380);
+    const dx = Math.cos(angle)*dist;
+    const dy = Math.sin(angle)*dist - rand(80,220);
+    gsap.to(el, {
+      x: dx, y: dy, rotation: rand(-360,360), opacity:0, duration: rand(1.8,2.8),
+      scale: rand(.7,1.45), ease:'power3.out',
+      onComplete: ()=> el.remove()
+    });
+  }
+}
+
+function openGift(){
+  document.querySelector('.tap-hint').style.opacity = 0;
+  document.getElementById('soundBtn').classList.add('visible');
+  sfxRibbon();
+  const tl = gsap.timeline();
+  tl.to('#giftWrap', {scale:1.035, duration:.2, ease:'power1.out'})
+    .to('#giftWrap', {x:-6, rotation:-1, duration:.09, repeat:7, yoyo:true, ease:'sine.inOut'}, '+=.18')
+    .to('#giftWrap', {x:0, rotation:0, scale:1, duration:.5, ease:'elastic.out(1,.5)'})
+    .to('#warmLight', {opacity:.32, duration:1.1, ease:'power2.out'}, '-=.2')
+    .call(()=> sfxRibbon(), null, '+=.25')
+    .to(['#loopLeft','#loopRight'], {y:-18, rotate:rand(-12,12), opacity:0, duration:.9, ease:'power3.in', stagger:.12})
+    .to('#knot', {y:-24, rotate:20, opacity:0, duration:.75, ease:'power2.in'}, '<.08')
+    .to(['#tailLeft','#tailRight'], {y:58, rotate:180, opacity:0, duration:1, ease:'power3.in'}, '<.05')
+    .to('#warmLight', {opacity:1, duration:.9, ease:'power2.out'}, '+=.12')
+    .call(()=> sfxOpen(), null, '+=.18')
+    .to('#lidGroup', {y:-54, rotate:-7, duration:.55, ease:'power2.out'})
+    .to('#lidGroup', {y:-74, rotate:-18, duration:1.15, ease:'power3.inOut'})
+    .to('#lidGroup', {y:-104, opacity:0, duration:.85, ease:'power2.in'}, '-=.22')
+    .call(()=>{
+      const rect = giftWrap.getBoundingClientRect();
+      spawnBurstPetals(rect.left+rect.width/2, rect.top+rect.height/2, 42);
+      sfxSparkleChime();
+    }, null, '-=.35')
+    .to('#app', {scale:1.14, rotateX:2, duration:1.35, ease:'power2.inOut'}, '-=.62')
+    .to('#flash', {opacity:.82, duration:.7, ease:'power1.in'}, '-=.32')
+    .call(()=>{
+      setPetalCount(30);
+      showScene(2);
+      gsap.set('#app', {scale:1});
+      playBouquetRise();
+    })
+    .to('#warmLight', {opacity:0, duration:1.5, ease:'power2.in'}, '+=.22')
+    .to('#flash', {opacity:0, duration:1.2, ease:'power1.out'}, '<');
+}
+
+/* ---------- Scene 2 : bouquet rise ---------- */
+function playBouquetRise(){
+  gsap.fromTo('#bouquetSvgWrap', {y:190, opacity:0, scale:.82, rotate:-5}, {y:0, opacity:1, scale:1, rotate:0, duration:2.35, ease:'back.out(1.15)'});
+  gsap.to('#bouquetSvgWrap', {rotation:1.4, duration:3.8, repeat:-1, yoyo:true, ease:'sine.inOut', delay:2.3});
+  gsap.to('#attachedNote', {opacity:1, x:0, y:0, rotation:-3, duration:1.2, delay:2.6, ease:'power3.out'});
+  gsap.timeline({delay:1.4})
+    .to('#displayLine', {opacity:1, y:0, duration:0.8, ease:'power2.out'})
+    .call(()=>{
+      setTimeout(()=>{
+        document.getElementById('toLetterBtn').classList.add('show');
+      }, 3000);
+    });
+}
+
+let parallaxX = 0, parallaxY = 0;
+window.addEventListener('pointermove', (event)=>{
+  parallaxX = (event.clientX / window.innerWidth - .5) * 12;
+  parallaxY = (event.clientY / window.innerHeight - .5) * 8;
+  if(document.getElementById('scene2').classList.contains('active')){
+    gsap.to('#bouquetSvgWrap', {x:parallaxX, y:parallaxY, duration:1.2, overwrite:true, ease:'power2.out'});
+  }
+});
+
+document.getElementById('toLetterBtn').addEventListener('click', ()=>{
+  const tl = gsap.timeline();
+  tl.to('#toLetterBtn', {opacity:0, duration:0.3})
+    .to('#displayLine', {opacity:0, duration:0.3}, '<')
+    .to('#attachedNote', {opacity:0, x:18, y:8, duration:.55, ease:'power2.in'}, '<')
+    .to('#bouquetSvgWrap', {x:'-30vw', scale:0.8, duration:0.8, ease:'power2.inOut'}, '<')
+    .call(()=>{ showScene(3); playEnvelopeRise(); });
+});
+
+/* ---------- Scene 3 : envelope ---------- */
+function playEnvelopeRise(){
+  gsap.fromTo('#envelopeSvgWrap', {y:130, opacity:0, rotate:-5, scale:.92}, {y:0, opacity:1, rotate:0, scale:1, duration:1.7, ease:'back.out(1.15)'});
+  gsap.to('#envelopeSvgWrap', {rotation:1.8, duration:2.8, repeat:-1, yoyo:true, ease:'sine.inOut', delay:1.7});
+}
+
+let envOpened = false;
+document.getElementById('envelopeSvgWrap').addEventListener('click', ()=>{
+  if(envOpened) return;
+  envOpened = true;
+  sfxPaper();
+  document.getElementById('envHint').style.opacity = 0;
+  const tl = gsap.timeline();
+  tl.to('#envelopeSvgWrap', {scale:1.04, duration:.35, ease:'power2.out'})
+    .to('#waxSeal', {scale:1.18, duration:.2, ease:'power2.out', transformOrigin:'center'})
+    .to('#waxSeal', {scale:0, rotation:18, opacity:0, duration:0.55, ease:'power2.in', transformOrigin:'center'})
+    .call(()=>{
+      const rect = document.getElementById('envelopeSvgWrap').getBoundingClientRect();
+      spawnBurstPetals(rect.left+rect.width/2, rect.top+rect.height/2, 10);
+    })
+    .to('#envFlap', {rotateX:180, duration:1.05, ease:'power3.inOut', transformOrigin:'top'}, '-=0.05')
+    .call(()=> sfxOpen())
+    .to('#envelopeSvgWrap', {opacity:0, y:-60, z:80, rotate:2, duration:1.1, ease:'power2.in'}, '+=0.65')
+    .call(()=>{
+      showScene(4);
+      playLetter();
+    });
+});
+
+/* ---------- Scene 4 : letter ---------- */
+const letterText = [
+  "My Love,",
+  "",
+  "Happy Girlfriend's Day ❤️",
+  "",
+  "Even though miles separate us, not a single day passes without you being on my mind.",
+  "",
+  "These flowers may be digital, but every feeling behind them is real.",
+  "",
+  "Thank you for being my happiness, my peace, and the most beautiful part of my life.",
+  "",
+  "One day I won't send flowers through a screen—I'll hand them to you in person.",
+  "",
+  "Until then, here's a little piece of my heart.",
+  "",
+  "I love you My Baby ❤️",
+  "",
+  "Forever Yours,",
+  "Duffer ❤️"
+];
+
+function playLetter(){
+  const container = document.getElementById('letterLines');
+  container.innerHTML = '';
+  letterText.forEach(line=>{
+    const div = document.createElement('div');
+    if(line === ''){ div.className = 'letter-line spacer'; }
+    else { div.className = 'letter-line'; div.textContent = line; }
+    container.appendChild(div);
+  });
+  const lines = container.querySelectorAll('.letter-line:not(.spacer)');
+  gsap.timeline()
+    .fromTo('#paper', {opacity:0, y:64, rotateX:-18, scaleY:.94}, {opacity:1, y:0, rotateX:0, scaleY:1, duration:1.45, ease:'power3.out'})
+    .call(()=> sfxPaper())
+    .to(lines, {opacity:1, y:0, duration:0.7, stagger:0.5, ease:'power2.out'}, '+=0.2')
+    .call(()=>{
+      setTimeout(finishLetter, (lines.length*500) + 1800);
+    });
+}
+
+function finishLetter(){
+  const tl = gsap.timeline();
+  tl.to('#paper', {opacity:0, y:-30, rotateX:8, duration:0.9, ease:'power2.in'})
+    .call(()=>{
+      showScene(5);
+      playFinalScene();
+    });
+}
+
+/* ---------- Scene 5 : final ---------- */
+function playFinalScene(){
+  finaleMode = true;
+  document.getElementById('finalBouquetWrap').innerHTML = buildBouquetSVG();
+  gsap.fromTo('#finalBouquetWrap', {opacity:0, y:55, scale:0.86, rotate:-3}, {opacity:1, y:0, scale:1, rotate:0, duration:1.7, ease:'power3.out'});
+  gsap.to('#finalBouquetWrap', {rotation:1.3, duration:5.5, repeat:-1, yoyo:true, ease:'sine.inOut', delay:1.8});
+  gsap.fromTo('#app', {scale:1.02}, {scale:.91, duration:18, ease:'power1.inOut'});
+  gsap.timeline({delay:0.6})
+    .to('#foreverTitle', {opacity:1, scale:1, duration:1.1, ease:'back.out(1.6)'});
+  setPetalCount(55);
+  petalIntensity = 1;
+  // slowly fade music over a couple minutes
+  setTimeout(()=>{
+    if(actx){
+      const now = actx.currentTime;
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.linearRampToValueAtTime(0.0001, now + 20);
+    }
+  }, 25000);
+}
+</script>
+</body>
+</html>
